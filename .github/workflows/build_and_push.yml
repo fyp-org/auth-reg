@@ -57,18 +57,18 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          origin: docker-compose.snippet.yml
-          destination: /FYP/FYP_back/services/${{ github.event.repository.name }}.yml
+          origin: docker-compose.yml
+          destination: /FYP/FYP_back/${{ github.event.repository.name }}/docker-compose.yml
 
       - name: Run Docker Compose on server
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
+          host:        ${{ secrets.SERVER_HOST }}
+          username:    ${{ secrets.SERVER_USERNAME }}
+          key:         ${{ secrets.SERVER_KEY }}
+          port:        ${{ secrets.SERVER_PORT }}
           script: |
-            cd /FYP/FYP_back/services
-            FILE="${{ github.event.repository.name }}.yml"
-            docker-compose -f "$FILE" pull
-            docker-compose -f "$FILE" up -d
+            mkdir -p /FYP/FYP_back/${{ github.event.repository.name }}
+            cd /FYP/FYP_back/${{ github.event.repository.name }}
+            docker-compose pull
+            docker-compose up -d
