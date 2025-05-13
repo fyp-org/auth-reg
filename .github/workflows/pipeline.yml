@@ -39,7 +39,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: youruser/reg-zareg:latest
+          tags: matveyb2005/reg-zareg:latest
 
   deploy:
     name: Deploy to Server via Docker Compose
