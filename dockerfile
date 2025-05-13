@@ -2,14 +2,6 @@ FROM python:3.10
 
 WORKDIR /app
 
-# Используем аргументы для передачи переменных
-ARG DATABASE_URL
-ARG KEY_REGLOG
-
-# Делаем переменные доступными внутри контейнера
-ENV DATABASE_URL=${DATABASE_URL}
-ENV KEY_REGLOG=${KEY_REGLOG}
-
 # Копируем зависимости
 COPY reg-zareg/requirements.txt /app/requirements.txt
 
