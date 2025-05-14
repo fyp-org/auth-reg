@@ -57,7 +57,7 @@ jobs:
   
       # Upload docker-compose.yml to server 
       - name: Checking docker-compose in fs
-        run: ls -al ./docker-compose.yaml
+        run: find . -name "docker-compose.yml"
       
       - name: Upload docker-compose.yaml
         uses: appleboy/scp-action@v0.1.3
