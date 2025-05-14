@@ -60,7 +60,7 @@ jobs:
         uses: nogsantos/ssh-scp-deploy@v1.3.0
         with:
           host: ${{ secrets.SERVER_HOST }}
-          user: ${{ secrets.SERVER_USERNAME }}
+          user: ${{ secrets.SERVER_NAME }}
           key: ${{ secrets.SERVER_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           src: docker-compose.yml
@@ -71,7 +71,7 @@ jobs:
         uses: nogsantos/ssh-scp-deploy@v1.3.0
         with:
           host: ${{ secrets.SERVER_HOST }}
-          user: ${{ secrets.SERVER_USERNAME }}
+          user: ${{ secrets.SERVER_NAME }}
           key: ${{ secrets.SERVER_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           src: .env
@@ -82,7 +82,7 @@ jobs:
         uses: nekiro/ssh-job@v1.0.5
         with:
           host:        ${{ secrets.SERVER_HOST }}
-          user:        ${{ secrets.SERVER_USERNAME }}
+          user:        ${{ secrets.SERVER_NAME }}
           key:         ${{ secrets.SERVER_KEY }}
           port:        ${{ secrets.SERVER_PORT }}
           password:    ${{ secrets.SERVER_PASSWORD }}
