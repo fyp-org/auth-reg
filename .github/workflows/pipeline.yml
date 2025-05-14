@@ -67,7 +67,7 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           source: ./docker-compose.yaml
-          target: /FYP/${{ github.event.repository.name }}/
+          target: /FYP/
 
   
       # Upload .env to server 
@@ -79,7 +79,7 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           source: .env
-          target: /FYP/${{ github.event.repository.name }}/
+          target: /FYP/
   
       # Оставляем SSH-Job как есть
       - name: Run Docker Compose on server
@@ -92,8 +92,8 @@ jobs:
           password:    ${{ secrets.SERVER_PASSWORD }}
           command: |
             mkdir -p /FYP/FYP_back/${{ github.event.repository.name }}
-            mv /FYP/${{ github.event.repository.name }}/docker-compose.yaml /FYP/FYP_back/${{ github.event.repository.name }}
-            mv /FYP/${{ github.event.repository.name }}/.env /FYP/FYP_back/${{ github.event.repository.name }}
-            cd /FYP/FYP_back/${{ github.event.repository.name }}
+            mv /FYP/docker-compose.yaml /FYP/FYP_back/
+            mv /FYP/.env /FYP/FYP_back/
+            cd /FYP/FYP_back/
             docker-compose pull
             docker-compose up -d
