@@ -49,7 +49,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-  
+
+      - name: Catting main.py
+        run: cat main.py
+      
       - name: Create .env file from secrets
         run: |
           echo "KEY_REGLOG=${{ secrets.KEY_REGLOG }}" >> .env
