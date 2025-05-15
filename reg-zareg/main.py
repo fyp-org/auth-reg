@@ -3,6 +3,8 @@ import datetime
 from datetime import timezone, timedelta
 
 from fastapi import FastAPI, Depends, HTTPException, Header, Response, Cookie
+# for cross-domain headers
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import jwt
@@ -21,6 +23,23 @@ API_KEY = os.getenv("KEY_REGLOG")
 JWT_SECRET = os.getenv("JWT_SECRET", "your_jwt_secret_here")
 JWT_ALGORITHM = "HS256"
 JWT_EXP_DELTA_HOURS = 1
+
+"""НЕ ИСПОЛЬЗОВАТЬ НАХУЙ В ПРОДЕ, ПОИСКАТЬ УМНОЕ РЕШЕНИЕ"""
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = origins,        # разрешённые источники запросов
+    allow_credentials = True,       # разрешить печеньки
+    allow_methods=["*"],            # разрешить все HTTP МЕТОДЫ
+    allow_headers=["*"],            # разрешить все заголовки
+
+)
+
+
+
 
 # Получение сессии с БД
 def get_db():
