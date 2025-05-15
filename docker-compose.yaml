@@ -1,9 +1,10 @@
 version: "3.9"
 
 services:
-  backend:
-    build: .
+  auth-reg:                       
+    image: matveyb2005/auth-reg:latest
     ports:
       - "8000:8000"
     env_file:
       - .env
+    restart: always               
