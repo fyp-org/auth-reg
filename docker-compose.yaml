@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   auth-reg:                       
-    image: matveyb2005/auth-reg:latest
+    image: matveyb2005/auth-reg@sha256:f3adb425e5481917f67ebb3c519cc9fa761c5f2e4f6b0681d2a612a7515a1ba4
     ports:
       - "8000:8000"
     env_file:
