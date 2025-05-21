@@ -62,14 +62,6 @@ jobs:
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
           echo "JWT_SECRET"=${{ secrets.JWT_SECRET }} >> .env
 
-      # Заменяем тег в docker-compose.yaml на образ с digest
-      - name: Replace image tag with digest in docker-compose.yaml
-        run: |
-          DIGEST=${{ needs.build-and-push.outputs.image_digest }}
-          echo "Using image digest: $DIGEST"
-          # Заменим строку с тегом на тег с digest
-          sed -i "s|matveyb2005/reg-zareg:latest|$DIGEST|g" docker-compose.yaml
-
       # Upload docker-compose.yaml to server 
       - name: Upload docker-compose.yaml
         uses: appleboy/scp-action@v0.1.3
