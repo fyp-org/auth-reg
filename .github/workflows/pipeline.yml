@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -36,7 +37,7 @@ jobs:
 
       - name: Set image tag based on commit SHA
         id: tag
-        run: echo "TAG=matveyb2005/reg-zareg:${{ github.sha }}" >> $GITHUB_ENV  # Используем уникальный тег для каждого пуша
+        run: echo "TAG=matveyb2005/auth-reg:${{ github.sha }}" >> $GITHUB_ENV  
 
       - name: Build and push image
         id: build_and_push
@@ -45,10 +46,10 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ${{ env.TAG }}  # Используем уникальный тег для образа
+          tags: ${{ env.TAG }}  
 
       - name: Show image digest
-        run: echo "Image digest is ${{ steps.build_and_push.outputs.digest }}"  # Выводим полный digest образа
+        run: echo "Image digest is ${{ steps.build_and_push.outputs.digest }}"  
 
   deploy:
     name: Deploy to Server via Docker Compose
@@ -67,10 +68,9 @@ jobs:
 
       - name: Replace image tag with digest in docker-compose.yaml
         run: |
-          DIGEST=${{ steps.build_and_push.outputs.digest }}  # Получаем digest из шага build-and-push
+          DIGEST=${{ steps.build_and_push.outputs.digest }}  # Получаем digest
           echo "Using image digest: $DIGEST"
-          # Заменяем тег latest на актуальный digest
-          sed -i "s|matveyb2005/reg-zareg:latest|matveyb2005/reg-zareg@$DIGEST|g" docker-compose.yaml
+          sed -i "s|matveyb2005/auth-reg:latest|matveyb2005/auth-reg@$DIGEST|g" docker-compose.yaml  # Заменяем на актуальный digest
 
       - name: Upload docker-compose.yaml to server
         uses: appleboy/scp-action@v0.1.3
