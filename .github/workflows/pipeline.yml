@@ -13,6 +13,8 @@ jobs:
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      image_digest: ${{ steps.build_and_push.outputs.digest }}
 
     steps:
       - name: Checkout code
@@ -53,20 +55,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Create .env file from secrets
         run: |
           echo "KEY_REGLOG=${{ secrets.KEY_REGLOG }}" >> .env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "JWT_SECRET"=${{ secrets.JWT_SECRET }} >> .env
 
       # Заменяем тег в docker-compose.yaml на образ с digest
       - name: Replace image tag with digest in docker-compose.yaml
         run: |
-          DIGEST=${{ steps.build-and-push.outputs.digest }}
+          DIGEST=${{ needs.build-and-push.outputs.image_digest }}
           echo "Using image digest: $DIGEST"
-          # Заменим строку с тегом на тег с digest (если в docker-compose.yaml есть matveyb2005/reg-zareg:latest)
+          # Заменим строку с тегом на тег с digest
           sed -i "s|matveyb2005/reg-zareg:latest|$DIGEST|g" docker-compose.yaml
-      
+
       # Upload docker-compose.yaml to server 
       - name: Upload docker-compose.yaml
         uses: appleboy/scp-action@v0.1.3
