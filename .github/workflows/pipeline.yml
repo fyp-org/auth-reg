@@ -1,10 +1,10 @@
-name: Build and Deploy reg-zareg
+name: Build and Deploy auth-reg
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-  push:
+  pull_request:
     branches:
       - main
   workflow_dispatch:
@@ -13,8 +13,6 @@ jobs:
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    outputs:
-      image_digest: ${{ steps.build_and_push.outputs.digest }}
 
     steps:
       - name: Checkout code
@@ -35,21 +33,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set image tag based on commit SHA
-        id: tag
-        run: echo "TAG=matveyb2005/auth-reg:${{ github.sha }}" >> $GITHUB_ENV  
+      - name: Set image tag (commit SHA)
+        run: echo "TAG=${{ github.sha }}" >> $GITHUB_ENV
 
-      - name: Build and push image
-        id: build_and_push
+      - name: Build and push image with tag
         uses: docker/build-push-action@v4
         with:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ${{ env.TAG }}  
+          tags: matveyb2005/auth-reg:${{ env.TAG }}
 
-      - name: Show image digest
-        run: echo "Image digest is ${{ steps.build_and_push.outputs.digest }}"  
+      - name: Replace image tag in docker-compose.yaml
+        run: |
+          sed -i "s|matveyb2005/auth-reg:latest|matveyb2005/auth-reg:${{ env.TAG }}|g" docker-compose.yaml
 
   deploy:
     name: Deploy to Server via Docker Compose
@@ -60,19 +57,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Create .env file from secrets
+      - name: Create .env from secrets
         run: |
           echo "KEY_REGLOG=${{ secrets.KEY_REGLOG }}" >> .env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
 
-      - name: Replace image tag with digest in docker-compose.yaml
-        run: |
-          DIGEST=${{ steps.build_and_push.outputs.digest }}  # Получаем digest
-          echo "Using image digest: $DIGEST"
-          sed -i "s|matveyb2005/auth-reg:latest|matveyb2005/auth-reg@$DIGEST|g" docker-compose.yaml  # Заменяем на актуальный digest
-
-      - name: Upload docker-compose.yaml to server
+      - name: Upload docker-compose.yaml
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -82,7 +73,7 @@ jobs:
           source: ./docker-compose.yaml
           target: /FYP/
 
-      - name: Upload .env to server
+      - name: Upload .env
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -92,7 +83,7 @@ jobs:
           source: .env
           target: /FYP/
 
-      - name: Run Docker Compose on server
+      - name: Run Docker Compose
         uses: nekiro/ssh-job@v1.0.5
         with:
           host:        ${{ secrets.SERVER_HOST }}
