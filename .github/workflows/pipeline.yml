@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -35,6 +34,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Set image tag based on commit SHA
+        id: tag
+        run: echo "TAG=matveyb2005/reg-zareg:${{ github.sha }}" >> $GITHUB_ENV  # Используем уникальный тег для каждого пуша
+
       - name: Build and push image
         id: build_and_push
         uses: docker/build-push-action@v4
@@ -42,10 +45,10 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: matveyb2005/reg-zareg:latest
+          tags: ${{ env.TAG }}  # Используем уникальный тег для образа
 
       - name: Show image digest
-        run: echo "Image digest is ${{ steps.build_and_push.outputs.digest }}"
+        run: echo "Image digest is ${{ steps.build_and_push.outputs.digest }}"  # Выводим полный digest образа
 
   deploy:
     name: Deploy to Server via Docker Compose
@@ -60,10 +63,16 @@ jobs:
         run: |
           echo "KEY_REGLOG=${{ secrets.KEY_REGLOG }}" >> .env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "JWT_SECRET"=${{ secrets.JWT_SECRET }} >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
 
-      # Upload docker-compose.yaml to server 
-      - name: Upload docker-compose.yaml
+      - name: Replace image tag with digest in docker-compose.yaml
+        run: |
+          DIGEST=${{ steps.build_and_push.outputs.digest }}  # Получаем digest из шага build-and-push
+          echo "Using image digest: $DIGEST"
+          # Заменяем тег latest на актуальный digest
+          sed -i "s|matveyb2005/reg-zareg:latest|matveyb2005/reg-zareg@$DIGEST|g" docker-compose.yaml
+
+      - name: Upload docker-compose.yaml to server
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -73,7 +82,6 @@ jobs:
           source: ./docker-compose.yaml
           target: /FYP/
 
-      # Upload .env to server 
       - name: Upload .env to server
         uses: appleboy/scp-action@v0.1.3
         with:
