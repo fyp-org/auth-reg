@@ -13,6 +13,8 @@ jobs:
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      image_digest: ${{ steps.build_and_push.outputs.digest }}
 
     steps:
       - name: Checkout code
@@ -33,20 +35,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set image tag (commit SHA)
-        run: echo "TAG=${{ github.sha }}" >> $GITHUB_ENV
-
-      - name: Build and push image with tag
+      - name: Build and push image
+        id: build_and_push
         uses: docker/build-push-action@v4
         with:
           context: .
           platforms: linux/amd64
           push: true
-          tags: matveyb2005/auth-reg:${{ env.TAG }}
+          tags: |
+            matveyb2005/auth-reg:latest
+            matveyb2005/auth-reg:${{ github.sha }}
 
-      - name: Replace image tag in docker-compose.yaml
+      - name: Replace image reference in docker-compose.yaml with digest
         run: |
-          sed -i "s|matveyb2005/auth-reg:latest|matveyb2005/auth-reg:${{ env.TAG }}|g" docker-compose.yaml
+          DIGEST="${{ steps.build_and_push.outputs.digest }}"
+          echo "Using digest: $DIGEST"
+          sed -i "s|matveyb2005/auth-reg:latest|matveyb2005/auth-reg@$DIGEST|g" docker-compose.yaml
 
   deploy:
     name: Deploy to Server via Docker Compose
@@ -92,11 +96,9 @@ jobs:
           port:        ${{ secrets.SERVER_PORT }}
           password:    ${{ secrets.SERVER_PASSWORD }}
           command: |
-           mkdir -p /FYP/FYP_back/${{ github.event.repository.name }}
-           mv /FYP/docker-compose.yaml /FYP/FYP_back/
-           mv /FYP/.env /FYP/FYP_back/
-           cd /FYP/FYP_back/
-           IMAGE=matveyb2005/auth-reg:${{ github.sha }}
-           docker rmi -f $IMAGE || true
-           docker-compose pull
-           docker-compose up -d --force-recreate
+            mkdir -p /FYP/FYP_back/${{ github.event.repository.name }}
+            mv /FYP/docker-compose.yaml /FYP/FYP_back/
+            mv /FYP/.env /FYP/FYP_back/
+            cd /FYP/FYP_back/
+            docker-compose pull
+            docker-compose up -d --force-recreate
