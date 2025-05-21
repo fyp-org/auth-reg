@@ -92,9 +92,11 @@ jobs:
           port:        ${{ secrets.SERVER_PORT }}
           password:    ${{ secrets.SERVER_PASSWORD }}
           command: |
-            mkdir -p /FYP/FYP_back/${{ github.event.repository.name }}
-            mv /FYP/docker-compose.yaml /FYP/FYP_back/
-            mv /FYP/.env /FYP/FYP_back/
-            cd /FYP/FYP_back/
-            docker-compose pull
-            docker-compose up -d --force-recreate
+           mkdir -p /FYP/FYP_back/${{ github.event.repository.name }}
+           mv /FYP/docker-compose.yaml /FYP/FYP_back/
+           mv /FYP/.env /FYP/FYP_back/
+           cd /FYP/FYP_back/
+           IMAGE=matveyb2005/auth-reg:${{ github.sha }}
+           docker rmi -f $IMAGE || true
+           docker-compose pull
+           docker-compose up -d --force-recreate
