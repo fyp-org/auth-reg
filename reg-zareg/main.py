@@ -31,12 +31,10 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = [
-        "http://localhost:5173"
-        ],        # разрешённые источники запросов
-    allow_credentials = True,       # разрешить печеньки
-    allow_methods=["*"],            # разрешить все HTTP МЕТОДЫ
-    allow_headers=["*"],            # разрешить все заголовки
+    allow_origins = ["http://localhost:5173"],        # разрешённые источники запросов
+    allow_credentials = True,                         # разрешить печеньки
+    allow_methods=["*"],                              # разрешить все HTTP МЕТОДЫ
+    allow_headers=["*"],                              # разрешить все заголовки
 
 )
 
