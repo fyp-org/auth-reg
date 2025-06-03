@@ -35,7 +35,7 @@ app.add_middleware(
     allow_origins = ["http://localhost:5173"],        # разрешённые источники запросов
     allow_credentials = True,                         # разрешить печеньки
     allow_methods=["*"],                              # разрешить все HTTP МЕТОДЫ
-    allow_headers=["*"],                              # разрешить все заголовки
+    allow_headers=["api_key", "Content-Type"],                              # разрешить все заголовки
 
 )
 
