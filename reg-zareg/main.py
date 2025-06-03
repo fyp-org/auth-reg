@@ -3,6 +3,7 @@ import datetime
 from datetime import timezone, timedelta
 
 from fastapi import FastAPI, Depends, HTTPException, Header, Response, Cookie
+from fastapi import Request
 # for cross-domain headers
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -50,7 +51,9 @@ def get_db():
         db.close()
 
 # Проверка API ключа
-def verify_api_key(api_key: str = Header(...)):
+def verify_api_key(request: Request, api_key: str = Header(None)):
+    if request.method == "OPTIONS":
+        return
     if api_key != API_KEY:
         raise HTTPException(status_code=403, detail="Invalid API Key")
 
