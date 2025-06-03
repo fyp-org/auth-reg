@@ -31,7 +31,9 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ["*"],        # разрешённые источники запросов
+    allow_origins = [
+        "http://localhost:5173"
+        ],        # разрешённые источники запросов
     allow_credentials = True,       # разрешить печеньки
     allow_methods=["*"],            # разрешить все HTTP МЕТОДЫ
     allow_headers=["*"],            # разрешить все заголовки
@@ -99,7 +101,7 @@ def login(
         key="access_token",
         value=token,
         httponly=True,
-        secure=True,      # для HTTPS; на локальной разработке можно установить в False
+        secure=False,      # для HTTPS; на локальной разработке можно установить в False
         samesite="None"   # используем "lax" или другой вариант, если не нужны кросс-доменные запросы
     )
     return response
