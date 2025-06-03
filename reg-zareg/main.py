@@ -25,18 +25,16 @@ JWT_SECRET = os.getenv("JWT_SECRET", "your_jwt_secret_here")
 JWT_ALGORITHM = "HS256"
 JWT_EXP_DELTA_HOURS = 1
 
-"""НЕ ИСПОЛЬЗОВАТЬ НАХУЙ В ПРОДЕ, ПОИСКАТЬ УМНОЕ РЕШЕНИЕ"""
-origins = [
-    "http://localhost:5173",
-]
+# For now, focusing on localhost
+allowed_origins_list = ["http://localhost:5173"]
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ["http://localhost:5173"],          # разрешённые источники запросов
-    allow_credentials = True,                           # разрешить печеньки
-    allow_methods=["*"],                                # разрешить все HTTP МЕТОДЫ
-    allow_headers=["api-key", "Content-Type"],          # разрешить все заголовки
-
+    allow_origins=allowed_origins_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["api-key", "Content-Type", "Authorization"],
 )
 
 
@@ -54,6 +52,7 @@ def get_db():
 def verify_api_key(request: Request, api_key: str = Header(None)):
     if request.method == "OPTIONS":
         return
+    
     if api_key != API_KEY:
         raise HTTPException(status_code=403, detail="Invalid API Key")
 
