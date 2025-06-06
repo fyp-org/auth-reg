@@ -1,6 +1,7 @@
 services:
-  auth-reg:                       
+  auth-reg:                     
     image: matveyb2005/auth-reg:latest
+    container_name: auth-reg
     env_file:
       - .env
     restart: always               
