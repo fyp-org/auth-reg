@@ -33,8 +33,8 @@ def create_user(db: Session, user: UserCreate):
     Create a new user in the database based on the UserCreate schema.
     """
     new_user = User(
-        name=user.name,
-        second_name=user.second_name,
+        #name=user.name,
+        #second_name=user.second_name,
         email=user.email,
         password=user.password
         # потом можно дополнить
