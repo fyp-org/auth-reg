@@ -26,7 +26,7 @@ JWT_ALGORITHM = "HS256"
 JWT_EXP_DELTA_HOURS = 1
 
 # For now, focusing on localhost
-allowed_origins_list = ["http://localhost:5173"]
+allowed_origins_list = ["http://localhost:5174"]
 
 
 app.add_middleware(
