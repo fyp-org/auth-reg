@@ -13,8 +13,8 @@ class UserLogin(BaseModel):
 
 class UserResponse(BaseModel):
     id_users: int
-    name: str
-    second_name: str
+    # name: str
+    # second_name: str
     email: str
 
     class Config:
