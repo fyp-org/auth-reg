@@ -26,15 +26,20 @@ JWT_ALGORITHM = "HS256"
 JWT_EXP_DELTA_HOURS = 1
 
 # For now, focusing on localhost
-allowed_origins_list = ["http://localhost:5174"]
-
+allowed_origins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://46.38.47.190"
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], #allowed_origins_list,
+    allow_origins=allowed_origins, #allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age = 600,
 )
 
 
