@@ -4,6 +4,8 @@ services:
     container_name: auth-reg
     env_file:
       - .env
+    ports:
+      - 8000:8000
     restart: always               
     networks:
       - fyp-default

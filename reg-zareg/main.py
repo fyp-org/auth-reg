@@ -70,13 +70,9 @@ def register_user(
     api_key: str = Depends(verify_api_key),
 ):
     db_user = crud.get_user_by_email(db, user.email)
-    response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    """
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_user(db=db, user=user)"""
-    return db_user
+    return crud.create_user(db=db, user=user)
 
 # Логин пользователя с выдачей JWT токена
 @app.post("/login")
