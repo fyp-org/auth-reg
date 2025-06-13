@@ -72,7 +72,13 @@ def register_user(
     db_user = crud.get_user_by_email(db, user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_user(db=db, user=user)
+    
+    new_user = crud.create_user(db=db, user=user)
+
+    return {
+       "message" : "user registered successfully"
+    }
+
 
 # Логин пользователя с выдачей JWT токена
 @app.post("/login")

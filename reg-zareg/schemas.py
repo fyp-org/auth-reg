@@ -16,6 +16,7 @@ class UserResponse(BaseModel):
     # name: str
     # second_name: str
     email: str
+    message: str
 
     class Config:
         orm_mode = True
