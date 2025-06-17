@@ -53,20 +53,11 @@ def get_db():
     finally:
         db.close()
 
-# Проверка API ключа
-def verify_api_key(request: Request, api_key: str = Header(None)):
-    if request.method == "OPTIONS":
-        return
-    
-    if api_key != API_KEY:
-        raise HTTPException(status_code=403, detail="Invalid API Key")
-
 # Регистрация пользователя
 @app.post("/register", response_model=schemas.MessageResponse, status_code=201)
 def register_user(
     user: schemas.UserCreate,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key),
 ):
     if crud.get_user_by_email(db, user.email):
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -80,7 +71,6 @@ def register_user(
 def login(
     user: schemas.UserLogin,
     db: Session = Depends(get_db),
-    api_key: str = Depends(verify_api_key)
 ):
     # Аутентификация пользователя (функция должна проверить email и password)
     db_user = auth.authenticate_user(db, user.email, user.password)
