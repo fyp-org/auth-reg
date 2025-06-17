@@ -10,7 +10,6 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import jwt
 
-from .schemas import UserCreate, UserResponse
 import schemas
 import database
 import auth
