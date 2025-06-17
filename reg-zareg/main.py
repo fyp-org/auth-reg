@@ -68,28 +68,22 @@ def register_user(
 
 # Логин пользователя с выдачей JWT токена
 @app.post("/login")
-def login(
-    user: schemas.UserLogin,
-    db: Session = Depends(get_db),
-):
-    # Аутентификация пользователя (функция должна проверить email и password)
+def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = auth.authenticate_user(db, user.email, user.password)
     if not db_user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    # Задаём время истечения токена (1 час)
-    expiration_time = datetime.datetime.now(timezone.utc) + timedelta(hours=JWT_EXP_DELTA_HOURS)
+    now = datetime.datetime.now(timezone.utc)
+    exp = now + timedelta(hours=JWT_EXP_DELTA_HOURS)
 
-    # Формируем полезную нагрузку для токена
     token_payload = {
         "user_id": db_user.id_users,
-        "exp": expiration_time,
-        "iat": datetime.datetime.now(timezone.utc)
+        "iat": now,
+        "exp": exp,
     }
-    # Генерация токена с помощью PyJWT
+    # PyJWT.encode возвращает строку
     token = jwt.encode(token_payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-    # Формирование ответа с установкой HTTP‑cookie для токена
     response = Response(
         content='{"message": "Login successful!"}',
         media_type="application/json"
@@ -98,12 +92,11 @@ def login(
         key="access_token",
         value=token,
         httponly=True,
-        secure=False,      # для HTTPS; на локальной разработке можно установить в False
-        samesite="None"   # используем "lax" или другой вариант, если не нужны кросс-доменные запросы
+        secure=False,
+        samesite="None"
     )
     return response
 
-# Функция для получения текущего пользователя по JWT, полученному из cookie
 def get_current_user(
     access_token: str = Cookie(None),
     db: Session = Depends(get_db)
@@ -111,6 +104,7 @@ def get_current_user(
     if not access_token:
         raise HTTPException(status_code=401, detail="Missing access token")
     try:
+        # decode возвращает словарь с payload
         payload = jwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = payload.get("user_id")
         if user_id is None:
@@ -119,13 +113,12 @@ def get_current_user(
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
-    # Получаем пользователя из БД по идентификатору
+
     user = crud.get_user_by_id(db, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-# Пример защищённого эндпоинта, к которому можно обратиться только с корректным JWT
 @app.get("/protected")
 def protected_route(current_user: schemas.UserResponse = Depends(get_current_user)):
     return {"message": f"Hello, {current_user.name}. This is a protected route."}
