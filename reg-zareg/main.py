@@ -82,7 +82,7 @@ def login(
 
     # Формируем полезную нагрузку для токена
     token_payload = {
-        "user_id": db_user.id,
+        "user_id": db_user.id_users,
         "exp": expiration_time,
         "iat": datetime.datetime.now(timezone.utc)
     }
