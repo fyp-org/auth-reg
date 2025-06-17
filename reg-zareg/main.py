@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import jwt
 
+from .schemas import UserCreate, UserResponse
 import schemas
 import database
 import auth
@@ -62,22 +63,17 @@ def verify_api_key(request: Request, api_key: str = Header(None)):
         raise HTTPException(status_code=403, detail="Invalid API Key")
 
 # Регистрация пользователя
-@app.post("/register", response_model=schemas.UserResponse)
+@app.post("/register", response_model=schemas.MessageResponse, status_code=201)
 def register_user(
     user: schemas.UserCreate,
-    response: Response,
     db: Session = Depends(get_db),
     api_key: str = Depends(verify_api_key),
 ):
-    db_user = crud.get_user_by_email(db, user.email)
-    if db_user:
+    if crud.get_user_by_email(db, user.email):
         raise HTTPException(status_code=400, detail="Email already registered")
-    
-    new_user = crud.create_user(db=db, user=user)
 
-    return {
-       "message" : "user registered successfully"
-    }
+    crud.create_user(db=db, user=user)
+    return {"message": "user registered successfully"}
 
 
 # Логин пользователя с выдачей JWT токена
