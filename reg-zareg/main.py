@@ -25,7 +25,7 @@ JWT_SECRET = os.getenv("JWT_SECRET", "your_jwt_secret_here")
 JWT_ALGORITHM = "HS256"
 JWT_EXP_DELTA_HOURS = 1
 
-# For now, focusing on localhost
+# Доступные адреса
 allowed_origins = [
     "http://localhost:5173",
     "http://localhost:5174",
